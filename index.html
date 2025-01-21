@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatterley - Knowledge Chatbot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: linear-gradient(to bottom, #8e44ad, #3498db);
+      color: white;
+    }
+
+    #header {
+      text-align: center;
+      padding: 15px;
+      background-color: rgba(0, 0, 0, 0.7);
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+      border-bottom: 1px solid #ccc;
+    }
+
+    #chat-container {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .message {
+      margin: 10px 0;
+      padding: 10px 15px;
+      border-radius: 10px;
+      max-width: 70%;
+      word-wrap: break-word;
+    }
+
+    .user-message {
+      align-self: flex-end;
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .bot-message {
+      align-self: flex-start;
+      background-color: #e0e0e0;
+      color: black;
+    }
+
+    #input-container {
+      display: flex;
+      padding: 10px;
+      background-color: #2c3e50;
+    }
+
+    #input-box {
+      flex-grow: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      outline: none;
+      font-size: 16px;
+    }
+
+    #send-button {
+      margin-left: 10px;
+      padding: 10px 20px;
+      background-color: #e67e22;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    #send-button:hover {
+      background-color: #d35400;
+    }
+  </style>
+</head>
+<body>
+  <div id="header">Chatterley - Your Knowledge Chatbot</div>
+  <div id="chat-container"></div>
+  <div id="input-container">
+    <input type="text" id="input-box" placeholder="Type a question..." />
+    <button id="send-button">Send</button>
+  </div>
+  <script>
+    const chatContainer = document.getElementById("chat-container");
+    const inputBox = document.getElementById("input-box");
+    const sendButton = document.getElementById("send-button");
+
+    // Knowledge base: General knowledge questions and answers
+    const knowledgeBase = {
+      "What is your name?": "I am Chatterley, your friendly chatbot!",
+      "How are you?": "I'm doing great, thank you for asking!",
+      "What is the capital of France?": "The capital of France is Paris.",
+      "What is the largest planet in our solar system?": "The largest planet in our solar system is Jupiter.",
+      "Who wrote 'Romeo and Juliet'?": "William Shakespeare wrote 'Romeo and Juliet.'",
+      "What is the tallest mountain in the world?": "The tallest mountain in the world is Mount Everest.",
+      "Who painted the Mona Lisa?": "Leonardo da Vinci painted the Mona Lisa.",
+      "What is the longest river in the world?": "The longest river in the world is the Nile River.",
+      "What is the capital of Japan?": "The capital of Japan is Tokyo.",
+      "What is the boiling point of water?": "The boiling point of water is 100°C or 212°F.",
+      "Who discovered gravity?": "Sir Isaac Newton discovered gravity.",
+      "What is the smallest country in the world?": "The smallest country in the world is Vatican City.",
+      "What is the national animal of India?": "The national animal of India is the Bengal Tiger.",
+      "What is the chemical symbol for water?": "The chemical symbol for water is H2O.",
+      "Who invented the light bulb?": "Thomas Edison is credited with inventing the light bulb.",
+      "What is the capital of the United States?": "The capital of the United States is Washington, D.C.",
+      "What is the hardest natural substance on Earth?": "The hardest natural substance on Earth is diamond.",
+      "How many continents are there?": "There are seven continents on Earth.",
+      "What is the largest desert in the world?": "The largest desert in the world is the Sahara Desert.",
+      "Who is the author of 'Harry Potter'?": "The author of 'Harry Potter' is J.K. Rowling.",
+      "What is the speed of light?": "The speed of light is approximately 299,792 kilometers per second.",
+      "What is the currency of Japan?": "The currency of Japan is the Yen.",
+      "Which gas do plants absorb from the atmosphere?": "Plants absorb carbon dioxide from the atmosphere.",
+      "Who was the first person to step on the moon?": "Neil Armstrong was the first person to step on the moon.",
+      "What is the capital of Canada?": "The capital of Canada is Ottawa.",
+      "Which planet is known as the Red Planet?": "Mars is known as the Red Planet.",
+      "How many bones are there in the human body?": "There are 206 bones in the human body.",
+      "What is the capital of Australia?": "The capital of Australia is Canberra.",
+      "Who discovered penicillin?": "Alexander Fleming discovered penicillin.",
+      "What is the largest mammal in the world?": "The largest mammal in the world is the blue whale.",
+      "What is the capital of Germany?": "The capital of Germany is Berlin.",
+      "What is the national flower of Japan?": "The national flower of Japan is the cherry blossom.",
+      "What is the name of the closest star to Earth?": "The closest star to Earth is the Sun.",
+      "Who developed the theory of relativity?": "Albert Einstein developed the theory of relativity.",
+      "What is the freezing point of water?": "The freezing point of water is 0°C or 32°F.",
+      "What is the largest island in the world?": "The largest island in the world is Greenland.",
+      "Which is the smallest bone in the human body?": "The smallest bone in the human body is the stapes in the ear.",
+      "What is the chemical symbol for gold?": "The chemical symbol for gold is Au.",
+      "Who is known as the Father of Computers?": "Charles Babbage is known as the Father of Computers.",
+      "Which planet is closest to the Sun?": "Mercury is the closest planet to the Sun.",
+      "What is the largest organ in the human body?": "The largest organ in the human body is the skin.",
+      "What is the capital of Italy?": "The capital of Italy is Rome.",
+      "What is the smallest planet in our solar system?": "The smallest planet in our solar system is Mercury.",
+      "What is the national bird of the United States?": "The national bird of the United States is the Bald Eagle.",
+    };
+
+    // Function to add messages to the chat
+    function addMessage(content, sender) {
+      const messageDiv = document.createElement("div");
+      messageDiv.className = `message ${sender}-message`;
+      messageDiv.textContent = content;
+      chatContainer.appendChild(messageDiv);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    // Function to get the bot's response
+    function getBotResponse(userMessage) {
+      return knowledgeBase[userMessage] || "I'm sorry, I don't know the answer to that.";
+    }
+
+    // Handle user input and bot response
+    sendButton.addEventListener("click", () => {
+      const userMessage = inputBox.value.trim();
+      if (!userMessage) return;
+
+      // Display user message
+      addMessage(userMessage, "user");
+      inputBox.value = "";
+
+      // Get and display bot response
+      const botResponse = getBotResponse(userMessage);
+      addMessage(botResponse, "bot");
+    });
+  </script>
+</body>
+</html>
